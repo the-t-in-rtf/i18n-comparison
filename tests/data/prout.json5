@@ -1,0 +1,62 @@
+/*
+
+  A corpus of data I use in a sort of "lorem ipsum" fashion, picking 0 or 1 and then a number from 0 to 23 to get a
+  random sentence.  Used in speed testing variable substitution at scale (100,000+ substitutions).
+
+  See annotated original at: https://everything2.com/title/Prout%2527s+words+for+the+Fugue+Subjects+of+Bach%2527s+Well-Tempered+Clavier
+
+*/
+[
+  [
+    "He went to town in a hat that made all the people stare.",
+    "John Sebastian Bach sat upon a tack, but he soon got up again with a howl!",
+    "O what a very jolly thing it is to kiss a pretty girl!",
+    "Broad beans and bacon...(1st countersubject)...make an excellent good dinner for a man who hasn't anything to eat.(2nd countersubject)...with half a pint of stout.",
+    "(Subject) Gin a body meet a body Comin' through the rye, (Answer) Gin a body kiss a body, Need a body cry?",
+    "He trod upon my corns with heavy boots—I yelled!",
+    "When I get aboard a Channel steamer I begin to feel sick.",
+    "You dirty boy! Just look at your face! Ain't you ashamed?",
+    "Hallo! Why, what the devil is the matter with the thing?",
+    "Half a dozen dirty little beggar boys are playing with a puppy at the bottom of the street.",
+    "The Bishop of Exeter was a most energetic man.",
+    "The slimy worm was writhing on the footpath.",
+    "Old Abram Brown was plagued with fleas, which caused him great alarm.",
+    "As I sat at the organ, the wretched blower went and let the wind out.",
+    "O Isabella Jane! Isabella Jane! Hold your jaw! Don't make such a fuss! Shut up! Here's a pretty row! What's it all about?",
+    "He spent his money, like a stupid ass.",
+    "Put me in my little bed.",
+    "How sad our state by nature is! What beastly fools we be!",
+    "There! I have given too much to the cabman!",
+    "On a bank of mud in the river Nile, upon a summer morning, a little hippopotamus was eating bread and jam.",
+    "A little three-part fugue, which a gentleman named Bach composed, there's a lot of triple counterpoint about it, and it isn't very difficult to play.",
+    "Brethren, the time is short!",
+    "He went and slept under a bathing-machine at Margate.",
+    "The man was very drunk, as to and fro, from left to right, across the road he staggered."
+  ],
+  [
+    "Sir Augustus Harris tried to mix a pound of treacle with a pint of castor oil.",
+    "Old Balaam's donkey spoke like an ass.",
+    "O, here's a lark!",
+    "Hey diddle diddle, the cat and the fiddle! The cow jumped over the moon!",
+    "To play these fugues through is real jam.",
+    "'Ark to the sound of the 'oofs of the galloping 'orse! I 'ear 'im comin' up Regent Street at night. (Countersubject:) 'Is 'oofs go 'ammer, 'ammer, 'ammer, 'ammer, 'ammer, 'ammer, on the 'ard 'ighway.",
+    "Mary, my dear, bring the whiskey and water in—bring the whiskey and water in.",
+    "I went to church last night, and slept all the sermon through.",
+    "I'd like to punch his head...(countersubject:) ...if he gives me any more of his bally cheek.",
+    "As I rode in a penny bus, going to the Mansion House, off came the wheel—down came the bus—all of the passengers fell in a heap on the floor of the rickety thing.",
+    "Needles and pins! Needles and pins! When a man's married his trouble begins.",
+    "I told you you'd have the stomach-ache if you put such a lot of pepper in your tea.",
+    "Great Scott! What a trouble it is to have to find the words for all these subjects!",
+    "She cut her throat with a paper-knife that had got no handle. (Subject, bar 20:) The wound was broad and deep. (Bar 36:) They called the village doctor in: he put a bit of blotting-paper on her neck.",
+    "The pretty little dickybirds are hopping to and fro upon the gravel walk before the house, and picking up the crumbs.",
+    "Oh, my eye! Oh, my eye! What a precious mess I'm getting into today.",
+    "I passed the night at a wayside inn, and could scarcely sleep a moment for the fleas.",
+    "Two little boys were at play, and the one gave the other a cuff on the head, and the other hit back. (Countersubject:) Their mother sent them both to bed without their tea.",
+    "In the middle of the Hackney Road today I saw a donkey in a fit.",
+    "He that would thrive must rise at five.",
+    "The noble Duke of York, he had ten thousand men, he marched them up the hill, and marched them down again.",
+    "O, dear! What shall I do? It's utterly impossible for me to learn this horrid fugue! I give it up! (Countersubject:) It ain't no use! It ain't a bit of good! Not a bit! No, not a bit!, No, not a bit!",
+    "See what ample strides he takes.",
+    "The wretched old street-singer has his clothes all in tatters, and toes showing through his boots."
+  ]
+]
