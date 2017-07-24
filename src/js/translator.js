@@ -5,11 +5,17 @@
 
  */
 /* globals require */
-(function () {
+(function (fluid) {
     "use strict";
-    var fluid = fluid || require("infusion");
+    fluid = fluid || require("infusion");
     fluid.defaults("gpii.i18nComparison.translator", {
-        gradeNames: ["fluid.component"],
+        gradeNames: ["fluid.modelComponent"],
+        events: {
+            onMessageBundleLoaded: null
+        },
+        model: {
+            messageBundle: {}
+        },
         invokers: {
             "translate": {
                 funcName: "fluid.notImplemented",
@@ -17,4 +23,4 @@
             }
         }
     });
-})();
+})(fluid);

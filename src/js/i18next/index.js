@@ -1,15 +1,14 @@
-/* globals require */
-(function () {
+/* globals require, fluid */
+(function (fluid, window) {
     "use strict";
-    var fluid = fluid || require("infusion");
+    fluid = fluid || require("infusion");
     var gpii  = fluid.registerNamespace("gpii");
     fluid.registerNamespace("gpii.i18nComparison.i18next");
 
-    var i18next = require("i18next");
-    gpii.i18nComparison.i18next.init = function (that) {
+    var i18next = window.i18next || require("i18next");
+    gpii.i18nComparison.i18next.loadMessages = function (that) {
         var i18nextOptions = fluid.copy(that.options.i18nextOptions);
         i18nextOptions.resources = { "en": { default: { "variable": "As my father used to say: '{{quote}}'." } }};
-        var messageBundle = require("../../../tests/data/glass.json5");
         /* eslint-disable */
         // Our sample data looks like:
         //
@@ -34,7 +33,7 @@
         // I missed it several times, so I'll point it out explicitly.  The object is nested by language key, then by
         // namespace, then by message key.  I was assuming namespace, then language key, then message key.
         /* eslint-enable */
-        fluid.each(messageBundle, function (entry) {
+        fluid.each(that.model.messageBundle, function (entry) {
             var locale = entry.locale.replace("_", "-");
             if (!i18nextOptions.resources[locale]) {
                 i18nextOptions.resources[locale] = { default: {} };
@@ -51,6 +50,9 @@
         i18next.init(i18nextOptions, function (err) {
             if (err) {
                 fluid.fail(err);
+            }
+            else {
+                that.events.onMessageBundleLoaded.fire();
             }
         });
     };
@@ -79,11 +81,11 @@
                 args:     ["{that}", "{arguments}.0", "{arguments}.1", "{arguments}.2"] // messageKey, variableContent, locale
             }
         },
-        listeners: {
-            "onCreate.init": {
-                funcName: "gpii.i18nComparison.i18next.init",
+        modelListeners: {
+            "messageBundle": {
+                funcName: "gpii.i18nComparison.i18next.loadMessages",
                 args:     ["{that}"]
             }
         }
     });
-})();
+})(fluid, typeof window === "undefined" ? { i18next: false} : window);

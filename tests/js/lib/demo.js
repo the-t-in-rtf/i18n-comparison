@@ -1,14 +1,13 @@
 /* globals require */
-(function () {
+(function (fluid) {
     "use strict";
-    var fluid = fluid || require("infusion");
+    fluid = fluid || require("infusion");
     fluid.setLogging(true);
 
     var gpii  = fluid.registerNamespace("gpii");
 
-    if (require) {
+    if (typeof require !== "undefined") {
         fluid.require("%i18n-comparison");
-        // TODO: We need to be sure this is also OK in the browser somehow.  Discuss
         require("require-json5");
     }
 
@@ -21,63 +20,96 @@
     };
 
     gpii.i18nComparison.demo.demoAll = function (that) {
-        var demoData = require("../../data/glass.json5");
-        var locales = fluid.transform(demoData, function (entry) { return entry.locale; });
-        var languages = gpii.i18nComparison.demo.getDistinct(fluid.transform(demoData, function (entry) { return entry.language; }));
+        var locales = fluid.transform(that.model.messageBundle, function (entry) { return entry.locale; });
+        var languages = gpii.i18nComparison.demo.getDistinct(fluid.transform(that.model.messageBundle, function (entry) { return entry.language; }));
 
-        var rawQuoteData = require("../../data/prout.json5");
         var quoteData = fluid.generate(100000, function () {
             var key1 = Math.round(Math.random() * 1);
             var key2 = Math.round(Math.random() * 23);
-            return rawQuoteData[key1][key2];
+            return that.model.quotes[key1][key2];
         }, true);
 
         var translatorComponents = fluid.queryIoCSelector(that, "gpii.i18nComparison.translator", true);
         fluid.each(translatorComponents, function (translatorComponent) {
             var startTime = Date.now();
-            fluid.log("Demonstrating component '" + translatorComponent.typeName + "'...");
+            console.log("Demonstrating component '" + translatorComponent.typeName + "'...");
 
-            fluid.log("Language data (by locale)...");
+            console.log("Language data (by locale)...");
             fluid.each(locales, function (locale) {
-                fluid.log("'", locale, "' = ", translatorComponent.translate("static", {}, locale));
+                console.log("'", locale, "' = ", translatorComponent.translate("static", {}, locale));
             });
-            fluid.log(Date.now() - startTime, " total milliseconds elapsed...");
+            console.log(Date.now() - startTime, " total milliseconds elapsed...");
 
-            fluid.log("Language data (by language)...");
+            console.log("Language data (by language)...");
             fluid.each(languages, function (language) {
-                fluid.log("'", language, "' = ", translatorComponent.translate("static", {}, language));
+                console.log("'", language, "' = ", translatorComponent.translate("static", {}, language));
             });
-            fluid.log(Date.now() - startTime, " total milliseconds elapsed...");
+            console.log(Date.now() - startTime, " total milliseconds elapsed...");
 
-            fluid.log("Variable interpolation...");
+            console.log("Variable interpolation (100,000 passes)...");
             fluid.each(quoteData, function (quote, index) {
                 var generatedText = translatorComponent.translate("variable", { quote: quote }, "en_US");
                 if (index === 0) {
-                    fluid.log(generatedText);
+                    console.log("Sample variable interpolation output: ", generatedText);
                 }
             });
-            fluid.log(Date.now() - startTime, " total milliseconds elapsed...");
+            console.log(Date.now() - startTime, " total milliseconds elapsed...");
         });
     };
 
     fluid.defaults("gpii.i18nComparison.demo", {
-        gradeNames: ["fluid.component"],
+        gradeNames: ["fluid.modelComponent"],
+        events: {
+            onMessageBundleLoaded: null,
+            onInfusionTranslatorReady: null,
+            onI8nextTranslatorReady: null,
+            onTranslatorsReady: {
+                events: {
+                    "onInfusionTranslatorReady": "onInfusionTranslatorReady",
+                    "onI8nextTranslatorReady": "onI8nextTranslatorReady"
+                }
+            }
+        },
+        model: {
+            // Although we don't yet use this in the demo work, I started with this as a model variable because IMO eventually we want to be able to reload bundles on the fly.
+            messageBundle: {}
+        },
         components: {
             infusion: {
-                type: "gpii.i18nComparison.infusion"
+                type: "gpii.i18nComparison.infusion",
+                createOnEvent: "onMessageBundleLoaded",
+                options: {
+                    listeners: {
+                        "onMessageBundleLoaded.notifyParent": {
+                            func: "{gpii.i18nComparison.demo}.events.onInfusionTranslatorReady.fire"
+                        }
+                    },
+                    model: {
+                        messageBundle: "{gpii.i18nComparison.demo}.model.messageBundle"
+                    }
+                }
             },
             i18next: {
-                type: "gpii.i18nComparison.i18next"
+                type: "gpii.i18nComparison.i18next",
+                createOnEvent: "onMessageBundleLoaded",
+                options: {
+                    listeners: {
+                        "onMessageBundleLoaded.notifyParent": {
+                            func: "{gpii.i18nComparison.demo}.events.onI8nextTranslatorReady.fire"
+                        }
+                    },
+                    model: {
+                        messageBundle: "{gpii.i18nComparison.demo}.model.messageBundle"
+                    }
+                }
             }
         },
         listeners: {
-            "onCreate.demoAll": {
+            "onTranslatorsReady.demoAll": {
                 funcName: "gpii.i18nComparison.demo.demoAll",
                 args: ["{that}"]
             }
         }
     });
-
-    gpii.i18nComparison.demo();
-})();
+})(fluid);
 

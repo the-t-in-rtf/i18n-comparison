@@ -1,15 +1,15 @@
 /* globals require */
-(function () {
+(function (fluid) {
     "use strict";
-    var fluid = fluid || require("infusion");
+    fluid = fluid || require("infusion");
     var gpii = fluid.registerNamespace("gpii");
 
     fluid.registerNamespace("gpii.i18nComparison.infusion");
 
     // TODO: Make a browser-friendly approach to this.
-    gpii.i18nComparison.infusion.loadMessages = function () {
+    gpii.i18nComparison.infusion.loadMessages = function (that) {
         var messageBase = {};
-        var messageBundle = require("../../../tests/data/glass.json5");
+        // TODO: I believe the i18n chars are incorrectly treated as irregular whitespace by ESLINT.  Make a simple example and file a bug.a
         /* eslint-disable */
         /*
          Our sample data looks like:
@@ -32,7 +32,7 @@
         /* eslint-enable */
         // The first entry for a given key wins. This is purely for demonstration purposes, we should discuss a cleaner
         // fallback strategy.
-        fluid.each(messageBundle, function (entry) {
+        fluid.each(that.model.messageBundle, function (entry) {
             var keys = ["static", "static" + "_" + entry.locale, "static" + "_" + entry.language];
             fluid.each(keys, function (key) {
                 if (!messageBase[key]) {
@@ -43,32 +43,46 @@
 
         messageBase.variable = "As my father used to say: '%quote'.";
 
-        return messageBase;
+        that.messageBase = messageBase;
+        that.events.onMessageBundleLoaded.fire();
     };
 
     gpii.i18nComparison.infusion.translate = function (that, messageKey, variableContent, locale) {
-        var keys = [messageKey + "_" + locale, messageKey];
+        if (that.msgResolver) {
+            var keys = [messageKey + "_" + locale, messageKey];
 
-        return fluid.find(keys, function (key) {
-            // TODO: Discuss adding support for resolving dot paths, so that we can organize message bundles into categories rather than having a thousand at the same top level.
-            // https://github.com/fluid-project/infusion/blob/16a963d63dce313ab3f2e3a81c725c2cbef0af79/src/framework/renderer/js/fluidRenderer.js#L68
-            var resolvedMessage = that.msgResolver.resolve(key, variableContent);
-            // TODO: I know this is terrible, but I can't seem to use the lookup invoker to check for the existence of a value up front.  It always returns `undefined`.
-            if (resolvedMessage.indexOf("not found") === -1) { return resolvedMessage; }
-        });
+            return fluid.find(keys, function (key) {
+                // TODO: Discuss adding support for resolving dot paths, so that we can organize message bundles into categories rather than having a thousand at the same top level.
+                // https://github.com/fluid-project/infusion/blob/16a963d63dce313ab3f2e3a81c725c2cbef0af79/src/framework/renderer/js/fluidRenderer.js#L68
+                var resolvedMessage = that.msgResolver.resolve(key, variableContent);
+                // TODO: I know this is terrible, but I can't seem to use the lookup invoker to check for the existence of a value up front.  It always returns `undefined`.
+                if (resolvedMessage.indexOf("not found") === -1) { return resolvedMessage; }
+            });
+        }
+        else {
+            fluid.fail("Not ready to translate yet...");
+        }
     };
 
     // TODO: Discuss the fact that the resource loader seems to only support one language per component, which is why I bypassed it.
     fluid.defaults("gpii.i18nComparison.infusion", {
         gradeNames: ["gpii.i18nComparison.translator"],
-        messageBase: "@expand:gpii.i18nComparison.infusion.loadMessages()",
-        distributeOptions: {
-            source: "{that}.options.messageBase",
-            target: "{that > msgResolver}.options.messageBase"
+        members: {
+            messageBase: {}
         },
         components: {
             msgResolver: {
-                type: "fluid.messageResolver"
+                type: "fluid.messageResolver",
+                createOnEvent: "onMessageBundleLoaded",
+                options: {
+                    messageBase: "{gpii.i18nComparison.infusion}.messageBase"
+                }
+            }
+        },
+        listeners: {
+            "onCreate.loadMessages": {
+                funcName: "gpii.i18nComparison.infusion.loadMessages",
+                args:     ["{that}"]
             }
         },
         invokers: {
@@ -78,4 +92,4 @@
             }
         }
     });
-})();
+})(fluid);
