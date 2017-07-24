@@ -51,13 +51,15 @@
         if (that.msgResolver) {
             var keys = [messageKey + "_" + locale, messageKey];
 
-            return fluid.find(keys, function (key) {
+            var resolvedMessage = fluid.find(keys, function (key) {
                 // TODO: Discuss adding support for resolving dot paths, so that we can organize message bundles into categories rather than having a thousand at the same top level.
                 // https://github.com/fluid-project/infusion/blob/16a963d63dce313ab3f2e3a81c725c2cbef0af79/src/framework/renderer/js/fluidRenderer.js#L68
                 var resolvedMessage = that.msgResolver.resolve(key, variableContent);
                 // TODO: I know this is terrible, but I can't seem to use the lookup invoker to check for the existence of a value up front.  It always returns `undefined`.
                 if (resolvedMessage.indexOf("not found") === -1) { return resolvedMessage; }
             });
+            // Use the message key if we can't resolve it to a message bundle.  This allows us to pass inline template content to the translator as well.
+            return resolvedMessage || fluid.stringTemplate(messageKey, variableContent);
         }
         else {
             fluid.fail("Not ready to translate yet...");
