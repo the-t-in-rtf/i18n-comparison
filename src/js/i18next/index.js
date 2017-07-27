@@ -9,7 +9,6 @@
     gpii.i18nComparison.i18next.loadMessages = function (that) {
         var i18nextOptions = fluid.copy(that.options.i18nextOptions);
         i18nextOptions.resources = { "en": { default: { "variable": "As my father used to say: '{{quote}}'." } }};
-        /* eslint-disable */
         // Our sample data looks like:
         //
         // {
@@ -17,22 +16,21 @@
         //   "language": "sa",
         //   "country": "IN",
         //   "title": "Sanskrit",
-        //   "text": "﻿काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥" // eslint:disable-line no-irregular-whitespace
+        //   "text": "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
         // },
         //
         // i18next expects resource bundles like:
         //
         // resources: {
-        //   "en-US": { // language slash locale, note that the dashes are required
+        //   "sa-IN": { // language slash locale, note that the dashes are required
         //     translation: { // namespace
-        //       "key": "hello world" // message key and value
+        //       "key": "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥" // message key and value
         //     }
         //   }
         // }
         //
         // I missed it several times, so I'll point it out explicitly.  The object is nested by language key, then by
         // namespace, then by message key.  I was assuming namespace, then language key, then message key.
-        /* eslint-enable */
         fluid.each(that.model.messageBundle, function (entry) {
             var locale = entry.locale.replace("_", "-");
             if (!i18nextOptions.resources[locale]) {

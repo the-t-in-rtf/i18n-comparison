@@ -9,8 +9,6 @@
     // TODO: Make a browser-friendly approach to this.
     gpii.i18nComparison.infusion.loadMessages = function (that) {
         var messageBase = {};
-        // TODO: I believe the i18n chars are incorrectly treated as irregular whitespace by ESLINT.  Make a simple example and file a bug.a
-        /* eslint-disable */
         /*
          Our sample data looks like:
 
@@ -19,14 +17,14 @@
          "language": "sa",
          "country": "IN",
          "title": "Sanskrit",
-         "text": "﻿काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
+         "text": "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
          },
 
          We generate a list of values suffixed by locale, as in:
 
-         "static":       "﻿काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
-         "static_sa":    "﻿काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
-         "static_sa_IN": "﻿काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
+         "static":       "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
+         "static_sa":    "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
+         "static_sa_IN": "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"
 
          */
         /* eslint-enable */
@@ -51,6 +49,16 @@
         if (that.msgResolver) {
             var keys = [messageKey + "_" + locale, messageKey];
 
+            /*
+
+             Improve by using a lookup.
+             Add a ticket to update the docs.
+
+             demo.infusion.msgResolver.lookup(["variable"])
+             Object {template: "As my father used to say: '%quote'.", resolveFunc: function}
+             demo.infusion.msgResolver.lookup(["notfound"])
+             undefined
+             */
             var resolvedMessage = fluid.find(keys, function (key) {
                 // TODO: Discuss adding support for resolving dot paths, so that we can organize message bundles into categories rather than having a thousand at the same top level.
                 // https://github.com/fluid-project/infusion/blob/16a963d63dce313ab3f2e3a81c725c2cbef0af79/src/framework/renderer/js/fluidRenderer.js#L68
