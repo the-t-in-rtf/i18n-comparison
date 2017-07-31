@@ -47,27 +47,25 @@
 
     gpii.i18nComparison.infusion.translate = function (that, messageKey, variableContent, locale) {
         if (that.msgResolver) {
-            var keys = [messageKey + "_" + locale, messageKey];
+            // TODO: The real implementation will have a function and unit tests for this bit.
+            // Turn a locale or partial locale into its component bits so that we end up looking up the first match of
+            //
+            //   1. `key-{locale}`, as in `key-en_US`
+            //   2. `key-{language}`, as in `key-en`
+            //   3. `key`
+            var keys = [messageKey];
+            var segments = locale.split(/[-_]/);
+            for (var a = 0; a < segments.length; a++) {
+                var subSegments = segments.slice(0, a + 1);
+                var generatedKey = subSegments ? messageKey + "-" + subSegments.join("_") : messageKey;
+                keys.unshift(generatedKey);
+            }
 
-            /*
+            // This uses fluid.find an other bits inside so that we get the first message we find.
+            var resolvedMessage = that.msgResolver.lookup(keys);
 
-             Improve by using a lookup.
-             Add a ticket to update the docs.
-
-             demo.infusion.msgResolver.lookup(["variable"])
-             Object {template: "As my father used to say: '%quote'.", resolveFunc: function}
-             demo.infusion.msgResolver.lookup(["notfound"])
-             undefined
-             */
-            var resolvedMessage = fluid.find(keys, function (key) {
-                // TODO: Discuss adding support for resolving dot paths, so that we can organize message bundles into categories rather than having a thousand at the same top level.
-                // https://github.com/fluid-project/infusion/blob/16a963d63dce313ab3f2e3a81c725c2cbef0af79/src/framework/renderer/js/fluidRenderer.js#L68
-                var resolvedMessage = that.msgResolver.resolve(key, variableContent);
-                // TODO: I know this is terrible, but I can't seem to use the lookup invoker to check for the existence of a value up front.  It always returns `undefined`.
-                if (resolvedMessage.indexOf("not found") === -1) { return resolvedMessage; }
-            });
             // Use the message key if we can't resolve it to a message bundle.  This allows us to pass inline template content to the translator as well.
-            return resolvedMessage || fluid.stringTemplate(messageKey, variableContent);
+            return resolvedMessage && resolvedMessage.template || fluid.stringTemplate(messageKey, variableContent);
         }
         else {
             fluid.fail("Not ready to translate yet...");

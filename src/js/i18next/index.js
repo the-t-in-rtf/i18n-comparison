@@ -5,6 +5,7 @@
     var gpii  = fluid.registerNamespace("gpii");
     fluid.registerNamespace("gpii.i18nComparison.i18next");
 
+    // TODO: This seems very wrong, refresh my memory about cross-environment loading.
     var i18next = window.i18next || require("i18next");
     gpii.i18nComparison.i18next.loadMessages = function (that) {
         var i18nextOptions = fluid.copy(that.options.i18nextOptions);

@@ -29,6 +29,7 @@
     "gpii-testem": "1.0.2-dev.20170719T133405Z.0df166e",
     "grunt": "1.0.1",
     "grunt-jsonlint": "1.1.0",
+    "node-jqunit": "1.1.6",
     "testem": "1.16.1"
   }
 }

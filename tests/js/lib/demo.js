@@ -1,9 +1,11 @@
 /* globals require */
-(function (fluid) {
+(function (fluid, window) {
     "use strict";
     fluid = fluid || require("infusion");
     fluid.setLogging(true);
 
+    // TODO:  This seems very wrong.
+    var jqUnit = window.jqUnit || require("node-jqunit");
     var gpii  = fluid.registerNamespace("gpii");
 
     if (typeof require !== "undefined") {
@@ -23,37 +25,48 @@
         var locales = fluid.transform(that.model.messageBundle, function (entry) { return entry.locale; });
         var languages = gpii.i18nComparison.demo.getDistinct(fluid.transform(that.model.messageBundle, function (entry) { return entry.language; }));
 
-        var quoteData = fluid.generate(100000, function () {
-            var key1 = Math.round(Math.random() * 1);
-            var key2 = Math.round(Math.random() * 23);
-            return that.model.quotes[key1][key2];
-        }, true);
-
         var translatorComponents = fluid.queryIoCSelector(that, "gpii.i18nComparison.translator", true);
         fluid.each(translatorComponents, function (translatorComponent) {
-            var startTime = Date.now();
-            console.log("Demonstrating component '" + translatorComponent.typeName + "'...");
+            jqUnit.module("Testing component " + translatorComponent.typeName + "...");
 
-            console.log("Language data (by locale)...");
-            fluid.each(locales, function (locale) {
-                console.log("'", locale, "' = ", translatorComponent.translate("static", {}, locale));
+            jqUnit.test(translatorComponent.typeName + ": Language data (by locale)...", function () {
+                jqUnit.expect(locales.length);
+                fluid.each(locales, function (locale) {
+                    var translatedString = translatorComponent.translate("static", {}, locale);
+                    jqUnit.assertTrue("There should be translated content for locale '" + locale + "'...", translatedString && translatedString.length > 0);
+                });
             });
-            console.log(Date.now() - startTime, " total milliseconds elapsed...");
 
-            console.log("Language data (by language)...");
-            fluid.each(languages, function (language) {
-                console.log("'", language, "' = ", translatorComponent.translate("static", {}, language));
+            jqUnit.test(translatorComponent.typeName + ": Language data (by language)...", function () {
+                jqUnit.expect(languages.length);
+                fluid.each(languages, function (language) {
+                    var translatedString = translatorComponent.translate("static", {}, language);
+                    jqUnit.assertTrue("There should be translated content for language '" + language + "'...", translatedString && translatedString.length > 0);
+                });
             });
-            console.log(Date.now() - startTime, " total milliseconds elapsed...");
 
-            console.log("Variable interpolation (100,000 passes)...");
-            fluid.each(quoteData, function (quote, index) {
-                var generatedText = translatorComponent.translate("variable", { quote: quote }, "en_US");
-                if (index === 0) {
-                    console.log("Sample variable interpolation output: ", generatedText);
-                }
-            });
-            console.log(Date.now() - startTime, " total milliseconds elapsed...");
+            // How many translations can be accomplished in a second?
+            var translationPasses = 0;
+            var translationStart = Date.now();
+            while (Date.now() - translationStart < 1000) {
+                var randomLocaleIndex = Math.round(Math.random() * (locales.length - 1));
+                var locale = locales[randomLocaleIndex];
+                translatorComponent.translate("static", {}, locale);
+                translationPasses++;
+            }
+            console.log(translatorComponent.typeName, ": completed ", translationPasses, "translation passes in 1 second.");
+
+            // TODO: Flip the script, see how many variable interpolations can be accomplished in a second.
+            var interpolationPasses = 0;
+            var interpolationStart = Date.now();
+            while (Date.now() - interpolationStart < 1000) {
+                var key1 = Math.round(Math.random() * 1);
+                var key2 = Math.round(Math.random() * 23);
+                var quote = that.model.quotes[key1][key2];
+                translatorComponent.translate("variable", { quote: quote }, "en_US");
+                interpolationPasses++;
+            }
+            console.log(translatorComponent.typeName, ": completed ", interpolationPasses, "variable interpolation passes in 1 second.");
         });
     };
 
@@ -111,5 +124,5 @@
             }
         }
     });
-})(fluid);
+})(fluid, typeof window === "undefined" ? { jqUnit: false } : window);
 
