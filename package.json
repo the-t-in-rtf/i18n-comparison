@@ -4,7 +4,9 @@
   "description": "A comparison of four Javascript libraries that handle i18n and l10n of string messages.",
   "main": "index.js",
   "scripts": {
-    "test": "node tests/all-tests.js"
+    "test": "npm run test:node && npm run test:browser",
+    "test:browser": "node node_modules/testem/testem.js ci --file tests/testem.js",
+    "test:node": "node tests/js/node-demo.js"
   },
   "repository": {
     "type": "git",
